@@ -1,0 +1,152 @@
+---
+title: "gust rejection analysis notebook"
+output: html_notebook
+
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+
+```{r}
+install.packages("lme4")
+install.packages("arm")
+install.packages("nlme")
+install.packages("brms")
+install.packages('lmerTest')
+install.packages('languageR')
+install.packages('MCMCglmm')
+```
+
+```{r}
+library(lme4)
+library(arm)
+library(brms)
+library(nlme)
+library(languageR)
+library(MCMCglmm)
+
+all_data_df <- read.csv("~/Research/Spanwise_uniform_gust_response/metrics_data/all_data_df.csv")
+
+lmm.data <- all_data_df
+head(lmm.data)
+
+
+high_lift_df <- all_data_df[all_data_df$flight_cond == '9_10',]
+med_lift_df <- all_data_df[all_data_df$flight_cond == '5_15',]
+low_lift_df <- all_data_df[all_data_df$flight_cond == '5_10',]
+
+```
+```{r}
+high_lift_df$taps.f <- factor(high_lift_df$taps)
+contrasts(high_lift_df$taps.f) <- contr.treatment(3, base = 3)
+
+High_er <- MCMCglmm(e_reduct ~ tap_cat, random=~contID + gust_dir, data = high_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+High_er_dev <- MCMCglmm(red_dev ~ tap_cat, random=~contID + gust_dir, data = high_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+High_rt <- MCMCglmm(r_time ~ tap_cat, random=~contID + gust_dir, data = high_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+print(summary(High_er))
+print(summary(High_er_dev))
+print(summary(High_rt))
+
+high_er_summ <- summary(High_er)
+
+print(high_er_summ)
+high_er_summ_sol <- high_er_summ$solutions
+write.csv(high_er_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_high_er.csv", row.names = TRUE)
+
+high_er_dev_summ <- summary(High_er)
+
+print(high_er_dev_summ)
+high_er_dev_summ_sol <- high_er_dev_summ$solutions
+write.csv(high_er_dev_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_high_er_dev.csv", row.names = TRUE)
+
+high_rt_summ <- summary(High_rt)
+
+print(high_rt_summ)
+high_rt_summ_sol <- high_rt_summ$solutions
+write.csv(high_rt_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_high_rt.csv", row.names = TRUE)
+```
+```{r}
+plot(High_er$Sol)
+
+```
+```{r}
+
+med_lift_df$taps.f <- factor(med_lift_df$taps)
+contrasts(med_lift_df$taps.f) <- contr.treatment(3, base = 3)
+
+med_er <- MCMCglmm(e_reduct ~ tap_cat, random=~contID + gust_dir, data = med_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+med_er_dev <- MCMCglmm(red_dev ~ tap_cat, random=~contID + gust_dir, data = med_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+med_rt <- MCMCglmm(r_time ~ tap_cat, random=~contID + gust_dir, data = med_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+print(summary(med_er))
+print(summary(med_er_dev))
+print(summary(med_rt))
+
+med_er_summ <- summary(med_er)
+
+print(med_er_summ)
+med_er_summ_sol <- med_er_summ$solutions
+write.csv(med_er_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_med_er.csv", row.names = TRUE)
+
+med_er_dev_summ <- summary(med_er)
+
+print(med_er_dev_summ)
+med_er_dev_summ_sol <- med_er_dev_summ$solutions
+write.csv(med_er_dev_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_med_er_dev.csv", row.names = TRUE)
+
+med_rt_summ <- summary(med_rt)
+
+print(med_rt_summ)
+med_rt_summ_sol <- med_rt_summ$solutions
+write.csv(med_rt_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_med_rt.csv", row.names = TRUE)
+```
+
+
+
+```{r}
+low_lift_df$taps.f <- factor(low_lift_df$taps)
+contrasts(low_lift_df$taps.f) <- contr.treatment(3, base = 3)
+
+low_er <- MCMCglmm(e_reduct ~ tap_cat, random=~contID + gust_dir, data = low_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+low_er_dev <- MCMCglmm(red_dev ~ tap_cat, random=~contID + gust_dir, data = low_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+low_rt <- MCMCglmm(r_time ~ tap_cat, random=~contID + gust_dir, data = low_lift_df,verbose=FALSE,
+                    nitt = 60000, burnin = 5000, thin = 30)
+print(summary(low_er))
+print(summary(low_er_dev))
+print(summary(low_rt))
+
+low_er_summ <- summary(low_er)
+
+print(low_er_summ)
+low_er_summ_sol <- low_er_summ$solutions
+write.csv(low_er_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_low_er.csv", row.names = TRUE)
+
+low_er_dev_summ <- summary(low_er)
+
+print(low_er_dev_summ)
+low_er_dev_summ_sol <- low_er_dev_summ$solutions
+write.csv(low_er_dev_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_low_er_dev.csv", row.names = TRUE)
+
+low_rt_summ <- summary(low_rt)
+
+print(low_rt_summ)
+low_rt_summ_sol <- low_rt_summ$solutions
+write.csv(low_rt_summ_sol, "~/Research/Spanwise_uniform_gust_response/metrics_data/mcmc_summ_low_rt.csv", row.names = TRUE)
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
